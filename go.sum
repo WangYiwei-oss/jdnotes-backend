@@ -3,6 +3,8 @@ github.com/WangYiwei-oss/jdframe v0.0.0-20211122121041-76066e6791e9 h1:WhrXGueao
 github.com/WangYiwei-oss/jdframe v0.0.0-20211122121041-76066e6791e9/go.mod h1:iMLWEhuF17gibdOCr7phlGal4fq+XanL57XmaSHr5KM=
 github.com/WangYiwei-oss/jdframe v0.0.0-20211209131323-e6f62d8e3de8 h1:R4shGCyqsUW6w3n4BOakAQEO6KOAUNmBHfvtTsflLQk=
 github.com/WangYiwei-oss/jdframe v0.0.0-20211209131323-e6f62d8e3de8/go.mod h1:3urzC6ac7zGAw6GqlY6/yygLks5dNTewkXdQLBoqe18=
+github.com/WangYiwei-oss/jdframe v0.0.0-20211212130630-adde7c77c55d h1:5zVYUMpSm88ELLRRG9Ue/uWrJv2pPnBy9gTC+mswwAI=
+github.com/WangYiwei-oss/jdframe v0.0.0-20211212130630-adde7c77c55d/go.mod h1:3urzC6ac7zGAw6GqlY6/yygLks5dNTewkXdQLBoqe18=
 github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20210914074925-ce3c483ec505 h1:0EIn0z+ULLxOcyq7NmbqHlOxh/HGcZiU039t+SV/aO4=
 github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20210914074925-ce3c483ec505/go.mod h1:F7bn7fEU90QkQ3tnmaTx3LTKLEDqnwWODIYppRQ5hnY=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
