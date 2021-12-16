@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/WangYiwei-oss/jdframe/src/jdft"
+	"github.com/WangYiwei-oss/jdnotes-backend/src/models"
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 )
@@ -16,13 +17,8 @@ func NewLoginController() *LoginController {
 }
 
 func (l *LoginController) Login(ctx *gin.Context) int {
-	type User struct {
-		Id       int    `gorm:"column:id" json:"id"`
-		UserName string `gorm:"column:username" json:"name"`
-		Password string `gorm:"column:password" json:"password"`
-	}
 	data, _ := ioutil.ReadAll(ctx.Request.Body)
-	var user1 User
+	var user1 models.User
 	err := json.Unmarshal(data, &user1)
 	if err != nil {
 		return -400
