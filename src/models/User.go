@@ -1,7 +1,9 @@
 package models
 
+import "github.com/WangYiwei-oss/jdframe/src/jdft"
+
 type User struct {
-	Id       int    `gorm:"column:id" json:"id"`
-	UserName string `gorm:"column:username" json:"name"`
-	Password string `gorm:"column:password" json:"password"`
+	jdft.User
+	Intro string `gorm:"column:intro" json:"intro"`
+	Icon  string `gorm:"column:icon" json:"icon"`
 }

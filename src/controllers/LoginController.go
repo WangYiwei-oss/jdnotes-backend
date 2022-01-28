@@ -9,7 +9,7 @@ import (
 )
 
 type LoginController struct {
-	Db *jdft.GormAdapter `inject:"-"`
+	Db *jdft.Gorm `inject:"-"`
 }
 
 func NewLoginController() *LoginController {
@@ -24,7 +24,7 @@ func (l *LoginController) Login(ctx *gin.Context) int {
 		return -400
 	}
 	l.Db.Where("username = ? AND password = ?", user1.UserName, user1.Password).First(&user1)
-	if user1.Id == 0 {
+	if user1.UserId == 0 {
 		return -100
 	}
 	return 1

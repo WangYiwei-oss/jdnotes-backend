@@ -9,7 +9,7 @@ import (
 )
 
 type RegisterController struct {
-	Db *jdft.GormAdapter `inject:"-"`
+	Db *jdft.Gorm `inject:"-"`
 }
 
 func NewRegisterController() *RegisterController {
@@ -30,7 +30,7 @@ func (r *RegisterController) Register(ctx *gin.Context) int {
 	}
 	var user models.User
 	r.Db.Where("username = ?", ru.UserName).First(&user)
-	if user.Id > 0 {
+	if user.UserId > 0 {
 		return -102
 	}
 	user.UserName = ru.UserName
@@ -39,6 +39,8 @@ func (r *RegisterController) Register(ctx *gin.Context) int {
 	if result.Error != nil {
 		return -400
 	}
+
+	jdft.CasbinEnforcer.AddGroupingPolicy(user.UserName, "vip0")
 	return 1
 }
 
