@@ -2,14 +2,14 @@ package services
 
 import (
 	"fmt"
-	"github.com/WangYiwei-oss/jdnotes-backend/src/core"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/models"
 	v1 "k8s.io/api/apps/v1"
 )
 
 type DeploymentService struct {
-	DepMap        *core.DeploymentMap `inject:"-"`
-	CommonService *CommonService      `inject:"-"`
+	DepMap        *DeploymentMap `inject:"-"`
+	CommonService *CommonService `inject:"-"`
+	DepHandler    *DepHandler    `inject:"-"`
 }
 
 func NewDeploymentService() *DeploymentService {

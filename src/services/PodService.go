@@ -2,12 +2,11 @@ package services
 
 import (
 	"github.com/WangYiwei-oss/jdframe/src/jdft"
-	"github.com/WangYiwei-oss/jdnotes-backend/src/core"
 	corev1 "k8s.io/api/core/v1"
 )
 
 type PodService struct {
-	PodMap        *core.PodMap   `inject:"-"`
+	PodMap        *PodMap        `inject:"-"`
 	CommonService *CommonService `inject:"-"`
 }
 

@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/WangYiwei-oss/jdframe/src/jdft"
-	"github.com/WangYiwei-oss/jdnotes-backend/src/core"
+	"github.com/WangYiwei-oss/jdnotes-backend/src/services"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -12,8 +12,9 @@ import (
 )
 
 type K8sConfig struct {
-	DepHandler *core.DepHandler `inject:"-"`
-	PodHandler *core.PodHandler `inject:"-"`
+	DepHandler       *services.DepHandler       `inject:"-"`
+	PodHandler       *services.PodHandler       `inject:"-"`
+	NamespaceHandler *services.NamespaceHandler `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -41,6 +42,9 @@ func (k *K8sConfig) JdInitInformer() informers.SharedInformerFactory {
 
 	podInformer := fact.Core().V1().Pods()
 	podInformer.Informer().AddEventHandler(k.PodHandler)
+
+	namespaceInformer := fact.Core().V1().Namespaces()
+	namespaceInformer.Informer().AddEventHandler(k.NamespaceHandler)
 
 	fact.Start(wait.NeverStop)
 	return fact

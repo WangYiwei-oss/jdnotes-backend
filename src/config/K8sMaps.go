@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/WangYiwei-oss/jdnotes-backend/src/core"
+	"github.com/WangYiwei-oss/jdnotes-backend/src/services"
 	"k8s.io/client-go/kubernetes"
 )
 
@@ -13,10 +13,14 @@ func NewK8sMap() *K8sMap {
 	return &K8sMap{}
 }
 
-func (k *K8sMap) JdInitDepMap() *core.DeploymentMap {
-	return &core.DeploymentMap{}
+func (k *K8sMap) JdInitDepMap() *services.DeploymentMap {
+	return &services.DeploymentMap{}
 }
 
-func (k *K8sMap) JdInitPodMap() *core.PodMap {
-	return &core.PodMap{}
+func (k *K8sMap) JdInitPodMap() *services.PodMap {
+	return &services.PodMap{}
+}
+
+func (k *K8sMap) JdInitNamespaceMap() *services.NamespaceMap {
+	return &services.NamespaceMap{}
 }

@@ -22,3 +22,7 @@ func (s *ServiceConfig) JdInitDeploymentService() *services.DeploymentService {
 func (s *ServiceConfig) JdInitPodService() *services.PodService {
 	return services.NewPodService()
 }
+
+func (s *ServiceConfig) JdInitNamespaceService() *services.NamespaceService {
+	return services.NewNamespaceService()
+}

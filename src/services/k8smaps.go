@@ -1,4 +1,4 @@
-package core
+package services
 
 import (
 	"fmt"
@@ -45,6 +45,12 @@ func (d *DeploymentMap) Delete(dep *v1.Deployment) {
 				d.data.Store(dep.Namespace, newList)
 			}
 		}
+	}
+}
+
+func (d *DeploymentMap) DeleteNamespace(ns *corev1.Namespace) {
+	if _, ok := d.data.Load(ns.Name); ok {
+		d.data.Delete(ns.Namespace)
 	}
 }
 
@@ -125,4 +131,35 @@ func (p *PodMap) GetPodByNamespace(ns, podName string) (*corev1.Pod, error) {
 		return nil, fmt.Errorf("record %s.%s not found", ns, podName)
 	}
 	return nil, fmt.Errorf("namespace %s not found", ns)
+}
+
+////////////////////////////////////////////NamespaceMap
+
+type NamespaceMap struct {
+	data sync.Map
+}
+
+func NewNamespaceMap() *NamespaceMap {
+	return &NamespaceMap{}
+}
+
+func (n *NamespaceMap) Add(ns *corev1.Namespace) {
+	n.data.Store(ns.Name, ns)
+}
+func (n *NamespaceMap) Update(ns *corev1.Namespace) error {
+	n.data.Store(ns.Name, ns)
+	return nil
+}
+
+func (n *NamespaceMap) Delete(ns *corev1.Namespace) {
+	n.data.Delete(ns.Name)
+}
+
+func (n *NamespaceMap) ListNamespaces() ([]*corev1.Namespace, error) {
+	ret := make([]*corev1.Namespace, 0)
+	n.data.Range(func(key, value interface{}) bool {
+		ret = append(ret, value.(*corev1.Namespace))
+		return true
+	})
+	return ret, nil
 }

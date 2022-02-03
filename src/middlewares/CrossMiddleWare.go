@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -15,7 +14,6 @@ func CrossMiddleWare() gin.HandlerFunc {
 			context.Header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
 			context.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
 			context.Header("Access-Control-Allow-Credentials", "true")
-			fmt.Println("设置了")
 		}
 		if method == "OPTIONS" {
 			context.AbortWithStatus(http.StatusNoContent)
