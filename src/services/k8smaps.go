@@ -4,6 +4,7 @@ import (
 	"fmt"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	netv1beta1 "k8s.io/api/networking/v1beta1"
 	"sync"
 )
 
@@ -162,4 +163,124 @@ func (n *NamespaceMap) ListNamespaces() ([]*corev1.Namespace, error) {
 		return true
 	})
 	return ret, nil
+}
+
+////////////////////////////////////////////ServiceMap
+
+type ServiceMap struct {
+	data sync.Map
+}
+
+func NewServiceMap() *ServiceMap {
+	return &ServiceMap{}
+}
+
+func (s *ServiceMap) Add(service *corev1.Service) {
+	if list, ok := s.data.Load(service.Namespace); ok {
+		list = append(list.([]*corev1.Service), service)
+		s.data.Store(service.Namespace, list)
+	} else {
+		s.data.Store(service.Namespace, []*corev1.Service{service})
+	}
+}
+func (s *ServiceMap) Update(service *corev1.Service) error {
+	if list, ok := s.data.Load(service.Namespace); ok {
+		for i, rangePod := range list.([]*corev1.Service) {
+			if rangePod.Name == service.Name {
+				list.([]*corev1.Service)[i] = service
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("service-#{service.Name} not found")
+}
+
+func (s *ServiceMap) Delete(service *corev1.Service) {
+	if list, ok := s.data.Load(service.Namespace); ok {
+		for i, rangePod := range list.([]*corev1.Service) {
+			if rangePod.Name == service.Name {
+				newList := append(list.([]*corev1.Service)[:i], list.([]*corev1.Service)[i+1:]...)
+				s.data.Store(service.Namespace, newList)
+			}
+		}
+	}
+}
+
+func (s *ServiceMap) ListByNamespace(ns string) ([]*corev1.Service, error) {
+	if list, ok := s.data.Load(ns); ok {
+		return list.([]*corev1.Service), nil
+	}
+	return nil, fmt.Errorf("ServiceMap: namespace %s not found", ns)
+}
+
+func (s *ServiceMap) GetServiceByNamespace(ns, serviceName string) (*corev1.Service, error) {
+	if list, ok := s.data.Load(ns); ok {
+		for _, service := range list.([]*corev1.Service) {
+			if service.Name == serviceName {
+				return service, nil
+			}
+		}
+		return nil, fmt.Errorf("ServiceMap: record %s.%s not found", ns, serviceName)
+	}
+	return nil, fmt.Errorf("ServiceMap: namespace %s not found", ns)
+}
+
+////////////////////////////////////////////ServiceMap
+
+type IngressMap struct {
+	data sync.Map
+}
+
+func NewIngressMap() *IngressMap {
+	return &IngressMap{}
+}
+
+func (i *IngressMap) Add(ingress *netv1beta1.Ingress) {
+	if list, ok := i.data.Load(ingress.Namespace); ok {
+		list = append(list.([]*netv1beta1.Ingress), ingress)
+		i.data.Store(ingress.Namespace, list)
+	} else {
+		i.data.Store(ingress.Namespace, []*netv1beta1.Ingress{ingress})
+	}
+}
+func (i *IngressMap) Update(ingress *netv1beta1.Ingress) error {
+	if list, ok := i.data.Load(ingress.Namespace); ok {
+		for i, rangeIngress := range list.([]*netv1beta1.Ingress) {
+			if rangeIngress.Name == ingress.Name {
+				list.([]*netv1beta1.Ingress)[i] = ingress
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("IngressMap: Ingress-#{service.Name} not found")
+}
+
+func (i *IngressMap) Delete(ingress *netv1beta1.Ingress) {
+	if list, ok := i.data.Load(ingress.Namespace); ok {
+		for j, rangeIngress := range list.([]*netv1beta1.Ingress) {
+			if rangeIngress.Name == ingress.Name {
+				newList := append(list.([]*netv1beta1.Ingress)[:j], list.([]*netv1beta1.Ingress)[j+1:]...)
+				i.data.Store(ingress.Namespace, newList)
+			}
+		}
+	}
+}
+
+func (i *IngressMap) ListByNamespace(ns string) ([]*netv1beta1.Ingress, error) {
+	if list, ok := i.data.Load(ns); ok {
+		return list.([]*netv1beta1.Ingress), nil
+	}
+	return nil, fmt.Errorf("IngressMap: namespace %s not found", ns)
+}
+
+func (i *IngressMap) GetServiceByNamespace(ns, ingressName string) (*netv1beta1.Ingress, error) {
+	if list, ok := i.data.Load(ns); ok {
+		for _, ingress := range list.([]*netv1beta1.Ingress) {
+			if ingress.Name == ingressName {
+				return ingress, nil
+			}
+		}
+		return nil, fmt.Errorf("IngressMap: record %s.%s not found", ns, ingressName)
+	}
+	return nil, fmt.Errorf("IngressMap: namespace %s not found", ns)
 }

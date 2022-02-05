@@ -22,3 +22,11 @@ func (n *K8sHandler) JdInitPodHandlers() *services.PodHandler {
 func (n *K8sHandler) JdInitNamespaceHandlers() *services.NamespaceHandler {
 	return &services.NamespaceHandler{}
 }
+
+func (n *K8sHandler) JdInitServiceHandlers() *services.ServiceHandler {
+	return &services.ServiceHandler{}
+}
+
+func (n *K8sHandler) JdInitIngressHandlers() *services.IngressHandler {
+	return &services.IngressHandler{}
+}

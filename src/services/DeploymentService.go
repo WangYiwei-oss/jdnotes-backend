@@ -44,7 +44,7 @@ func (d *DeploymentService) ListNamespace(namespace string) (ret []*models.Deplo
 				item.Status.AvailableReplicas,
 				item.Status.UnavailableReplicas,
 			},
-			Images:     d.CommonService.GetImages(*item),
+			Images:     d.CommonService.GetImagesFromDeployment(*item),
 			IsComplete: d.getDeploymentIsComplete(item),
 			Message:    d.getDeploymentCondition(item),
 			CreateTime: item.CreationTimestamp.Format("2006-01-02 15:04:05"),

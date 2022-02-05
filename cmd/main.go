@@ -6,7 +6,6 @@ import (
 	"github.com/WangYiwei-oss/jdnotes-backend/src/config"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/controllers"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/middlewares"
-	"github.com/WangYiwei-oss/jdnotes-backend/src/services"
 )
 
 func migration() {
@@ -20,12 +19,9 @@ func main() {
 		DefaultBean().
 		Attach(middlewares.CrossMiddleWare()).
 		Beans(
-			services.NewDeploymentMap(),
-			services.NewPodMap(),
-			services.NewNamespaceMap(),
+			config.NewK8sMap(),
 			config.NewK8sHandler(),
 			config.NewK8sConfig(),
-			config.NewK8sMap(),
 			config.NewServiceConfig()).
 		Mount("v1",
 			controllers.NewLoginController(),
@@ -33,6 +29,8 @@ func main() {
 			controllers.NewDeploymentCtl(),
 			controllers.NewPodCtl(),
 			controllers.NewNamespaceCtl(),
+			controllers.NewServiceCtl(),
+			controllers.NewIngressCtl(),
 		).                                    //挂载路由
 		CronTask("0/3 * * * * *", func() {}). //定时器函数
 		Launch()

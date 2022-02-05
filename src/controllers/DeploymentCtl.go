@@ -42,12 +42,19 @@ func (d *DeploymentCtl) _readMessageCallback(client *wscore.WsClient, messageTyp
 	}
 }
 
+func (d *DeploymentCtl) _sendStrategy(labelmap wscore.WsClientLabel, vs ...interface{}) bool {
+	if labelmap["namespace"] == vs[0].(string) { //一样说明用户正在看当前发生改变的namespace，所以需要通知
+		return true
+	}
+	return false
+}
+
 func (d *DeploymentCtl) WebSocketConn(c *gin.Context) int {
 	client, err := wscore.Upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		return -103
 	} else {
-		jdft.WebSocketFactory.Store("deployments", client, make(map[string]string), nil, d._readMessageCallback)
+		jdft.WebSocketFactory.Store("deployments", client, make(map[string]string), d._sendStrategy, d._readMessageCallback)
 		return 1
 	}
 }

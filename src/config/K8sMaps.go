@@ -24,3 +24,11 @@ func (k *K8sMap) JdInitPodMap() *services.PodMap {
 func (k *K8sMap) JdInitNamespaceMap() *services.NamespaceMap {
 	return &services.NamespaceMap{}
 }
+
+func (k *K8sMap) JdInitServiceMap() *services.ServiceMap {
+	return &services.ServiceMap{}
+}
+
+func (k *K8sMap) JdInitIngressMap() *services.IngressMap {
+	return &services.IngressMap{}
+}

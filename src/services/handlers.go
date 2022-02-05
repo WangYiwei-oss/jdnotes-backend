@@ -1,9 +1,11 @@
 package services
 
 import (
+	"fmt"
 	"github.com/WangYiwei-oss/jdframe/src/jdft"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	netv1beta1 "k8s.io/api/networking/v1beta1"
 	"log"
 )
 
@@ -16,40 +18,57 @@ type DepHandler struct {
 
 func (d *DepHandler) OnAdd(obj interface{}) {
 	d.DepMap.Add(obj.(*v1.Deployment))
-	jdft.WebSocketFactory.SendAllClass("deployments", d.DepService.ListNamespace(obj.(*v1.Deployment).Namespace))
+	jdft.WebSocketFactory.SendAllClass("deployments",
+		d.DepService.ListNamespace(obj.(*v1.Deployment).Namespace),
+		obj.(*v1.Deployment).Namespace)
 }
 func (d *DepHandler) OnUpdate(oldObj, newObj interface{}) {
 	err := d.DepMap.Update(newObj.(*v1.Deployment))
 	if err != nil {
 		log.Println(err)
 	} else {
-		jdft.WebSocketFactory.SendAllClass("deployments", d.DepService.ListNamespace(newObj.(*v1.Deployment).Namespace))
+		jdft.WebSocketFactory.SendAllClass("deployments",
+			d.DepService.ListNamespace(newObj.(*v1.Deployment).Namespace),
+			newObj.(*v1.Deployment).Namespace)
 	}
 }
 
 func (d *DepHandler) OnDelete(obj interface{}) {
+	fmt.Println("删除了") //？？？？？？？？？？？？？为什么不删除
 	d.DepMap.Delete(obj.(*v1.Deployment))
-	jdft.WebSocketFactory.SendAllClass("deployments", d.DepService.ListNamespace(obj.(*v1.Deployment).Namespace))
+	jdft.WebSocketFactory.SendAllClass("deployments",
+		d.DepService.ListNamespace(obj.(*v1.Deployment).Namespace),
+		obj.(*v1.Deployment).Namespace)
 }
 
 ///////////////////PodHandler
 
 type PodHandler struct {
-	PodMap *PodMap `inject:"-"`
+	PodMap     *PodMap     `inject:"-"`
+	PodService *PodService `inject:"-"`
 }
 
 func (p *PodHandler) OnAdd(obj interface{}) {
 	p.PodMap.Add(obj.(*corev1.Pod))
+	jdft.WebSocketFactory.SendAllClass("pods",
+		p.PodService.ListNamespace(obj.(*corev1.Pod).Namespace),
+		obj.(*corev1.Pod).Namespace)
 }
 func (p *PodHandler) OnUpdate(oldObj, newObj interface{}) {
 	err := p.PodMap.Update(newObj.(*corev1.Pod))
 	if err != nil {
 		log.Println(err)
 	}
+	jdft.WebSocketFactory.SendAllClass("pods",
+		p.PodService.ListNamespace(newObj.(*corev1.Pod).Namespace),
+		newObj.(*corev1.Pod).Namespace)
 }
 
 func (p *PodHandler) OnDelete(obj interface{}) {
 	p.PodMap.Delete(obj.(*corev1.Pod))
+	jdft.WebSocketFactory.SendAllClass("pods",
+		p.PodService.ListNamespace(obj.(*corev1.Pod).Namespace),
+		obj.(*corev1.Pod).Namespace)
 }
 
 ///////////////////NamespaceHandler
@@ -70,4 +89,64 @@ func (n *NamespaceHandler) OnUpdate(oldObj, newObj interface{}) {
 
 func (n *NamespaceHandler) OnDelete(obj interface{}) {
 	n.NamespaceMap.Delete(obj.(*corev1.Namespace))
+}
+
+///////////////////ServiceHandler
+
+type ServiceHandler struct {
+	ServiceMap     *ServiceMap     `inject:"-"`
+	ServiceService *ServiceService `inject:"-"`
+}
+
+func (s *ServiceHandler) OnAdd(obj interface{}) {
+	s.ServiceMap.Add(obj.(*corev1.Service))
+	jdft.WebSocketFactory.SendAllClass("services",
+		s.ServiceService.ListNamespace(obj.(*corev1.Service).Namespace),
+		obj.(*corev1.Service).Namespace)
+}
+func (s *ServiceHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := s.ServiceMap.Update(newObj.(*corev1.Service))
+	if err != nil {
+		log.Println(err)
+	}
+	jdft.WebSocketFactory.SendAllClass("services",
+		s.ServiceService.ListNamespace(newObj.(*corev1.Service).Namespace),
+		newObj.(*corev1.Service).Namespace)
+}
+
+func (s *ServiceHandler) OnDelete(obj interface{}) {
+	s.ServiceMap.Delete(obj.(*corev1.Service))
+	jdft.WebSocketFactory.SendAllClass("services",
+		s.ServiceService.ListNamespace(obj.(*corev1.Service).Namespace),
+		obj.(*corev1.Service).Namespace)
+}
+
+///////////////////IngressHandler
+
+type IngressHandler struct {
+	IngressMap     *IngressMap     `inject:"-"`
+	IngressService *IngressService `inject:"-"`
+}
+
+func (i *IngressHandler) OnAdd(obj interface{}) {
+	i.IngressMap.Add(obj.(*netv1beta1.Ingress))
+	jdft.WebSocketFactory.SendAllClass("ingresses",
+		i.IngressService.ListNamespace(obj.(*netv1beta1.Ingress).Namespace),
+		obj.(*netv1beta1.Ingress).Namespace)
+}
+func (i *IngressHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := i.IngressMap.Update(newObj.(*netv1beta1.Ingress))
+	if err != nil {
+		log.Println(err)
+	}
+	jdft.WebSocketFactory.SendAllClass("ingresses",
+		i.IngressService.ListNamespace(newObj.(*netv1beta1.Ingress).Namespace),
+		newObj.(*netv1beta1.Ingress).Namespace)
+}
+
+func (i *IngressHandler) OnDelete(obj interface{}) {
+	i.IngressMap.Delete(obj.(*netv1beta1.Ingress))
+	jdft.WebSocketFactory.SendAllClass("ingresses",
+		i.IngressService.ListNamespace(obj.(*netv1beta1.Ingress).Namespace),
+		obj.(*netv1beta1.Ingress).Namespace)
 }

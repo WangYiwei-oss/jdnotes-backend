@@ -26,3 +26,11 @@ func (s *ServiceConfig) JdInitPodService() *services.PodService {
 func (s *ServiceConfig) JdInitNamespaceService() *services.NamespaceService {
 	return services.NewNamespaceService()
 }
+
+func (s *ServiceConfig) JdInitServiceService() *services.ServiceService {
+	return services.NewServiceService()
+}
+
+func (s *ServiceConfig) JdInitIngressService() *services.IngressService {
+	return services.NewIngressService()
+}
