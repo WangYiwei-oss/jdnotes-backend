@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/WangYiwei-oss/jdframe/src/jdft"
 	"github.com/WangYiwei-oss/jdframe/wscore"
+	"github.com/WangYiwei-oss/jdnotes-backend/src/models"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/services"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -52,7 +53,22 @@ func (i *IngressCtl) WebSocketConn(c *gin.Context) int {
 	}
 }
 
+// CreateIngress 创建ingress接口
+func (i *IngressCtl) CreateIngress(c *gin.Context) (int, string) {
+	postModel := &models.IngressPost{}
+	err := c.BindJSON(postModel)
+	if err != nil {
+		return -400, err.Error()
+	}
+	err = i.IngressService.CreateIngress(postModel)
+	if err != nil {
+		return -400, err.Error()
+	}
+	return 1, ""
+}
+
 func (i *IngressCtl) Build(jdft *jdft.Jdft) {
 	jdft.Handle("GET", "ingresses", i.GetList)
 	jdft.Handle("GET", "ingresses_ws", i.WebSocketConn)
+	jdft.Handle("POST", "ingress", i.CreateIngress)
 }
