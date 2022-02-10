@@ -273,7 +273,7 @@ func (i *IngressMap) ListByNamespace(ns string) ([]*netv1beta1.Ingress, error) {
 	return nil, fmt.Errorf("IngressMap: namespace %s not found", ns)
 }
 
-func (i *IngressMap) GetServiceByNamespace(ns, ingressName string) (*netv1beta1.Ingress, error) {
+func (i *IngressMap) GetIngressByNamespace(ns, ingressName string) (*netv1beta1.Ingress, error) {
 	if list, ok := i.data.Load(ns); ok {
 		for _, ingress := range list.([]*netv1beta1.Ingress) {
 			if ingress.Name == ingressName {

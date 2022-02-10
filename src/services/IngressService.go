@@ -38,6 +38,7 @@ func (i *IngressService) ListNamespace(ns string) (ret []*models.Ingress) {
 	return ret
 }
 
+// CreateIngress 创建 Ingress
 func (i *IngressService) CreateIngress(post *models.IngressPost) error {
 	className := "nginx"
 	ingressRules := []netv1beta1.IngressRule{}
@@ -79,6 +80,33 @@ func (i *IngressService) CreateIngress(post *models.IngressPost) error {
 	}
 
 	_, err := i.Client.NetworkingV1beta1().Ingresses(post.Namespace).Create(context.Background(), ingress, v1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (i *IngressService) GetIngressDetail(name, namespace string) (*models.IngressDetail, error) {
+	ingress, err := i.IngressMap.GetIngressByNamespace(namespace, name)
+	if err != nil {
+		return nil, err
+	} else {
+		detail := models.NewIngressDetail()
+		for _, rule := range ingress.Spec.Rules {
+			detail.Hosts = append(detail.Hosts, rule.Host)
+		}
+		detail.IsCors = false
+		if v, ok := ingress.Annotations["nginx.ingress.kubernetes.io/enable-cors"]; ok {
+			if v == "true" {
+				detail.IsCors = true
+			}
+		}
+		return detail, nil
+	}
+}
+
+func (i *IngressService) DelIngress(name, namespace string) error {
+	err := i.Client.NetworkingV1beta1().Ingresses(namespace).Delete(context.Background(), name, v1.DeleteOptions{})
 	if err != nil {
 		return err
 	}

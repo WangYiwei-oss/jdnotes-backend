@@ -67,8 +67,27 @@ func (i *IngressCtl) CreateIngress(c *gin.Context) (int, string) {
 	return 1, ""
 }
 
+func (i *IngressCtl) GetIngressDetail(c *gin.Context) (int, jdft.Json) {
+	detail, err := i.IngressService.GetIngressDetail(c.Query("name"), c.Query("namespace"))
+	if err != nil {
+		return -400, err.Error()
+	} else {
+		return 1, detail
+	}
+}
+
+func (i *IngressCtl) DeleteIngress(c *gin.Context) int {
+	err := i.IngressService.DelIngress(c.Query("name"), c.Query("namespace"))
+	if err != nil {
+		return -400
+	}
+	return 1
+}
+
 func (i *IngressCtl) Build(jdft *jdft.Jdft) {
 	jdft.Handle("GET", "ingresses", i.GetList)
 	jdft.Handle("GET", "ingresses_ws", i.WebSocketConn)
 	jdft.Handle("POST", "ingress", i.CreateIngress)
+	jdft.Handle("GET", "ingress_detail", i.GetIngressDetail)
+	jdft.Handle("DELETE", "ingress", i.DeleteIngress)
 }

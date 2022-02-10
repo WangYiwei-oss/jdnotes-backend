@@ -6,6 +6,17 @@ type Ingress struct {
 	CreateTime string `json:"create_time"`
 }
 
+type IngressDetail struct {
+	Hosts  []string `json:"hosts"`
+	IsCors bool     `json:"is_cors"`
+}
+
+func NewIngressDetail() *IngressDetail {
+	return &IngressDetail{Hosts: make([]string, 0),
+		IsCors: false,
+	}
+}
+
 type IngressPath struct {
 	Path    string `json:"path"`
 	SvcName string `json:"svc_name"`
