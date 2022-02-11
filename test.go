@@ -1,46 +1,28 @@
 package main
 
 import (
-	"github.com/fsnotify/fsnotify"
+	"context"
+	"fmt"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
 	"log"
 )
 
 func main() {
-	watcher, err := fsnotify.NewWatcher() //1. 先new
+	config, err := clientcmd.BuildConfigFromFlags("", "config")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-	defer watcher.Close() //记得释放
-	done := make(chan bool)
-	go func() {
-		for {
-			select {
-			case event, ok := <-watcher.Events:
-				if !ok {
-					return
-				}
-				log.Println("event:", event)
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					log.Println("modified file:", event.Name)
-				}
-				if event.Op&fsnotify.Write == fsnotify.Create {
-					log.Println("create file:", event.Name)
-				}
-				if event.Op&fsnotify.Write == fsnotify.Remove {
-					log.Println("remove file:", event.Name)
-				}
-			case err, ok := <-watcher.Errors:
-				if !ok {
-					return
-				}
-				log.Println("error:", err)
-			}
-		}
-	}()
-
-	err = watcher.Add("D:\\test")
+	c, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-	<-done
+	list, err := c.CoreV1().Pods("default").List(context.Background(), v1.ListOptions{})
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for _, pod := range list.Items {
+		fmt.Println(pod.Name)
+	}
 }

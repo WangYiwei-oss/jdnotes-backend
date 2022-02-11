@@ -225,7 +225,7 @@ func (s *ServiceMap) GetServiceByNamespace(ns, serviceName string) (*corev1.Serv
 	return nil, fmt.Errorf("ServiceMap: namespace %s not found", ns)
 }
 
-////////////////////////////////////////////ServiceMap
+////////////////////////////////////////////IngressMap
 
 type IngressMap struct {
 	data sync.Map
@@ -283,4 +283,64 @@ func (i *IngressMap) GetIngressByNamespace(ns, ingressName string) (*netv1beta1.
 		return nil, fmt.Errorf("IngressMap: record %s.%s not found", ns, ingressName)
 	}
 	return nil, fmt.Errorf("IngressMap: namespace %s not found", ns)
+}
+
+////////////////////////////////////////////SecretMap
+
+type SecretMap struct {
+	data sync.Map
+}
+
+func NewSecretMap() *SecretMap {
+	return &SecretMap{}
+}
+
+func (s *SecretMap) Add(secret *corev1.Secret) {
+	if list, ok := s.data.Load(secret.Namespace); ok {
+		list = append(list.([]*corev1.Secret), secret)
+		s.data.Store(secret.Namespace, list)
+	} else {
+		s.data.Store(secret.Namespace, []*corev1.Secret{secret})
+	}
+}
+func (s *SecretMap) Update(secret *corev1.Secret) error {
+	if list, ok := s.data.Load(secret.Namespace); ok {
+		for i, rangeSecret := range list.([]*corev1.Secret) {
+			if rangeSecret.Name == secret.Name {
+				list.([]*corev1.Secret)[i] = secret
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("SecretMap: Secret-#{secret.Name} not found")
+}
+
+func (s *SecretMap) Delete(secret *corev1.Secret) {
+	if list, ok := s.data.Load(secret.Namespace); ok {
+		for j, rangeIngress := range list.([]*corev1.Secret) {
+			if rangeIngress.Name == secret.Name {
+				newList := append(list.([]*corev1.Secret)[:j], list.([]*corev1.Secret)[j+1:]...)
+				s.data.Store(secret.Namespace, newList)
+			}
+		}
+	}
+}
+
+func (s *SecretMap) ListByNamespace(ns string) ([]*corev1.Secret, error) {
+	if list, ok := s.data.Load(ns); ok {
+		return list.([]*corev1.Secret), nil
+	}
+	return nil, fmt.Errorf("SecretMap: namespace %s not found", ns)
+}
+
+func (s *SecretMap) GetIngressByNamespace(ns, secretName string) (*corev1.Secret, error) {
+	if list, ok := s.data.Load(ns); ok {
+		for _, secret := range list.([]*corev1.Secret) {
+			if secret.Name == secretName {
+				return secret, nil
+			}
+		}
+		return nil, fmt.Errorf("SecretMap: record %s.%s not found", ns, secretName)
+	}
+	return nil, fmt.Errorf("SecretMap: namespace %s not found", ns)
 }

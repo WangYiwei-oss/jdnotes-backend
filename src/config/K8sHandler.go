@@ -30,3 +30,7 @@ func (n *K8sHandler) JdInitServiceHandlers() *services.ServiceHandler {
 func (n *K8sHandler) JdInitIngressHandlers() *services.IngressHandler {
 	return &services.IngressHandler{}
 }
+
+func (n *K8sHandler) JdInitSecretHandlers() *services.SecretHandler {
+	return &services.SecretHandler{}
+}

@@ -1,13 +1,11 @@
 package config
 
 import (
-	"fmt"
-	"github.com/WangYiwei-oss/jdframe/src/jdft"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/services"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	"log"
 )
 
@@ -17,6 +15,7 @@ type K8sConfig struct {
 	NamespaceHandler *services.NamespaceHandler `inject:"-"`
 	ServiceHandler   *services.ServiceHandler   `inject:"-"`
 	IngressHandler   *services.IngressHandler   `inject:"-"`
+	SecretHandler    *services.SecretHandler    `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -24,10 +23,14 @@ func NewK8sConfig() *K8sConfig {
 }
 
 func (*K8sConfig) JdInitClient() *kubernetes.Clientset {
-	ip := jdft.GetGlobalSettings()["KUBERNETES_HOST"]
-	config := &rest.Config{
-		Host:        fmt.Sprintf("http://%s", ip.(string)),
-		BearerToken: "6c38472af3b00688ab7929c185b56bc6",
+	//ip := jdft.GetGlobalSettings()["KUBERNETES_HOST"]
+	//config := &rest.Config{
+	//	Host:        fmt.Sprintf("http://%s", ip.(string)),
+	//	BearerToken: "6c38472af3b00688ab7929c185b56bc6",
+	//}
+	config, err := clientcmd.BuildConfigFromFlags("", "config")
+	if err != nil {
+		log.Fatalln(err)
 	}
 	c, err := kubernetes.NewForConfig(config)
 	if err != nil {
@@ -53,6 +56,9 @@ func (k *K8sConfig) JdInitInformer() informers.SharedInformerFactory {
 
 	ingressInformer := fact.Networking().V1beta1().Ingresses() //监听Ingress
 	ingressInformer.Informer().AddEventHandler(k.IngressHandler)
+
+	secretInformer := fact.Core().V1().Secrets()
+	secretInformer.Informer().AddEventHandler(k.SecretHandler)
 
 	fact.Start(wait.NeverStop)
 	return fact

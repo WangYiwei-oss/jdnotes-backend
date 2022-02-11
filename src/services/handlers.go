@@ -17,6 +17,7 @@ type DepHandler struct {
 }
 
 func (d *DepHandler) OnAdd(obj interface{}) {
+	fmt.Println("创建了dep")
 	d.DepMap.Add(obj.(*v1.Deployment))
 	jdft.WebSocketFactory.SendAllClass("deployments",
 		d.DepService.ListNamespace(obj.(*v1.Deployment).Namespace),
@@ -34,7 +35,7 @@ func (d *DepHandler) OnUpdate(oldObj, newObj interface{}) {
 }
 
 func (d *DepHandler) OnDelete(obj interface{}) {
-	fmt.Println("删除了") //？？？？？？？？？？？？？为什么不删除
+	fmt.Println("删除了dep") //？？？？？？？？？？？？？为什么不删除
 	d.DepMap.Delete(obj.(*v1.Deployment))
 	jdft.WebSocketFactory.SendAllClass("deployments",
 		d.DepService.ListNamespace(obj.(*v1.Deployment).Namespace),
@@ -149,4 +150,34 @@ func (i *IngressHandler) OnDelete(obj interface{}) {
 	jdft.WebSocketFactory.SendAllClass("ingresses",
 		i.IngressService.ListNamespace(obj.(*netv1beta1.Ingress).Namespace),
 		obj.(*netv1beta1.Ingress).Namespace)
+}
+
+///////////////////SecretHandler
+
+type SecretHandler struct {
+	SecretMap     *SecretMap     `inject:"-"`
+	SecretService *SecretService `inject:"-"`
+}
+
+func (s *SecretHandler) OnAdd(obj interface{}) {
+	s.SecretMap.Add(obj.(*corev1.Secret))
+	jdft.WebSocketFactory.SendAllClass("secrets",
+		s.SecretService.ListNamespace(obj.(*corev1.Secret).Namespace),
+		obj.(*corev1.Secret).Namespace)
+}
+func (s *SecretHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := s.SecretMap.Update(newObj.(*corev1.Secret))
+	if err != nil {
+		log.Println(err)
+	}
+	jdft.WebSocketFactory.SendAllClass("secrets",
+		s.SecretService.ListNamespace(newObj.(*corev1.Secret).Namespace),
+		newObj.(*corev1.Secret).Namespace)
+}
+
+func (s *SecretHandler) OnDelete(obj interface{}) {
+	s.SecretMap.Delete(obj.(*corev1.Secret))
+	jdft.WebSocketFactory.SendAllClass("secrets",
+		s.SecretService.ListNamespace(obj.(*corev1.Secret).Namespace),
+		obj.(*corev1.Secret).Namespace)
 }
