@@ -1,8 +1,11 @@
 package services
 
 import (
+	"context"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/models"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"log"
 )
 
@@ -19,9 +22,10 @@ func init() {
 }
 
 type PodService struct {
-	PodMap        *PodMap        `inject:"-"`
-	CommonService *CommonService `inject:"-"`
-	PodHandler    *PodHandler    `inject:"-"`
+	PodMap        *PodMap               `inject:"-"`
+	CommonService *CommonService        `inject:"-"`
+	PodHandler    *PodHandler           `inject:"-"`
+	Client        *kubernetes.Clientset `inject:"-"`
 }
 
 func NewPodService() *PodService {
@@ -48,4 +52,23 @@ func (p *PodService) ListNamespace(ns string) (ret []*models.Pod) {
 		})
 	}
 	return
+}
+
+func (p *PodService) DeletePod(name, namespace string) error {
+	return p.Client.CoreV1().Pods(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
+}
+
+func (p *PodService) GetPodContainer(name, namespace string) ([]*models.Container, error) {
+	ret := make([]*models.Container, 0)
+	pod, err := p.PodMap.GetPodByNamespace(namespace, name)
+	if err != nil {
+		return nil, err
+	}
+	for _, c := range pod.Spec.Containers {
+		ret = append(ret, &models.Container{
+			Name:  c.Name,
+			Image: c.Image,
+		})
+	}
+	return ret, nil
 }

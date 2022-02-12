@@ -62,11 +62,7 @@ func (s *SecretService) ListNamespace(ns string) (ret []*models.Secret) {
 }
 
 func (s *SecretService) DelSecret(name, namespace string) error {
-	err := s.Client.CoreV1().Secrets(namespace).Delete(context.Background(), name, v1.DeleteOptions{})
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.Client.CoreV1().Secrets(namespace).Delete(context.Background(), name, v1.DeleteOptions{})
 }
 
 func (s *SecretService) CreateSecret(post *models.SecretPost) error {

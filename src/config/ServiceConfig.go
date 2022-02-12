@@ -38,3 +38,7 @@ func (s *ServiceConfig) JdInitIngressService() *services.IngressService {
 func (s *ServiceConfig) JdInitSecretService() *services.SecretService {
 	return services.NewSecretService()
 }
+
+func (s *ServiceConfig) JdInitConfigMapService() *services.ConfigMapService {
+	return services.NewConfigMapService()
+}

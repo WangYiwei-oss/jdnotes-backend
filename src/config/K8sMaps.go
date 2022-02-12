@@ -36,3 +36,7 @@ func (k *K8sMap) JdInitIngressMap() *services.IngressMap {
 func (k *K8sMap) JdInitSecretMap() *services.SecretMap {
 	return &services.SecretMap{}
 }
+
+func (k *K8sMap) JdInitConfigMapMap() *services.ConfigMapMap {
+	return &services.ConfigMapMap{}
+}

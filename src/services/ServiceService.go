@@ -1,8 +1,11 @@
 package services
 
 import (
+	"context"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/models"
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"log"
 )
 
@@ -24,9 +27,10 @@ func init() {
 }
 
 type ServiceService struct {
-	ServiceMap      *ServiceMap     `inject:"-"`
-	CommonService   *CommonService  `inject:"-"`
-	ServicesHandler *ServiceHandler `inject:"-"`
+	ServiceMap      *ServiceMap           `inject:"-"`
+	CommonService   *CommonService        `inject:"-"`
+	ServicesHandler *ServiceHandler       `inject:"-"`
+	Client          *kubernetes.Clientset `inject:"-"`
 }
 
 func NewServiceService() *ServiceService {
@@ -50,4 +54,8 @@ func (s *ServiceService) ListNamespace(ns string) (ret []*models.Service) {
 		})
 	}
 	return ret
+}
+
+func (s *ServiceService) DeleteService(name, namespace string) error {
+	return s.Client.CoreV1().Services(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 }

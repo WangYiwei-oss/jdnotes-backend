@@ -25,11 +25,6 @@ func (d *DeploymentCtl) GetList(c *gin.Context) (int, jdft.Json) {
 	return 1, list
 }
 
-type wsMessage struct {
-	Namespace string `json:"namespace"`
-	Url       string `json:"url"`
-}
-
 func (d *DeploymentCtl) _readMessageCallback(client *wscore.WsClient, messageType int, message []byte) {
 	m := wsMessage{}
 	err := json.Unmarshal(message, &m)
@@ -59,7 +54,16 @@ func (d *DeploymentCtl) WebSocketConn(c *gin.Context) int {
 	}
 }
 
+func (d *DeploymentCtl) DeleteDeployment(c *gin.Context) int {
+	err := d.DepService.DeleteDeployment(c.Query("name"), c.Query("namespace"))
+	if err != nil {
+		return -400
+	}
+	return 1
+}
+
 func (d *DeploymentCtl) Build(jdft *jdft.Jdft) {
 	jdft.Handle("GET", "deployments", d.GetList)
 	jdft.Handle("GET", "deployments_ws", d.WebSocketConn)
+	jdft.Handle("DELETE", "deployment", d.DeleteDeployment)
 }

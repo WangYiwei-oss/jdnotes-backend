@@ -47,12 +47,21 @@ func (s *ServiceCtl) WebSocketConn(c *gin.Context) int {
 	if err != nil {
 		return -103
 	} else {
-		jdft.WebSocketFactory.Store("pods", client, make(map[string]string), s._sendStrategy, s._readMessageCallback)
+		jdft.WebSocketFactory.Store("services", client, make(map[string]string), s._sendStrategy, s._readMessageCallback)
 		return 1
 	}
+}
+
+func (s *ServiceCtl) DeleteSecret(c *gin.Context) int {
+	err := s.ServiceService.DeleteService(c.Query("name"), c.Query("namespace"))
+	if err != nil {
+		return -400
+	}
+	return 1
 }
 
 func (s *ServiceCtl) Build(jdft *jdft.Jdft) {
 	jdft.Handle("GET", "services", s.GetList)
 	jdft.Handle("GET", "services_ws", s.WebSocketConn)
+	jdft.Handle("DELETE", "service", s.DeleteSecret)
 }

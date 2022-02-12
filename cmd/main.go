@@ -32,6 +32,7 @@ func main() {
 			controllers.NewServiceCtl(),
 			controllers.NewIngressCtl(),
 			controllers.NewSecretCtl(),
+			controllers.NewConfigMapCtl(),
 		).                                    //挂载路由
 		CronTask("0/3 * * * * *", func() {}). //定时器函数
 		Launch()

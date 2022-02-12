@@ -34,3 +34,7 @@ func (n *K8sHandler) JdInitIngressHandlers() *services.IngressHandler {
 func (n *K8sHandler) JdInitSecretHandlers() *services.SecretHandler {
 	return &services.SecretHandler{}
 }
+
+func (n *K8sHandler) JdInitConfigMapHandlers() *services.ConfigMapHandler {
+	return &services.ConfigMapHandler{}
+}

@@ -2,9 +2,11 @@ package services
 
 import (
 	"fmt"
+	"github.com/WangYiwei-oss/jdnotes-backend/src/helper"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	netv1beta1 "k8s.io/api/networking/v1beta1"
+	"sort"
 	"sync"
 )
 
@@ -333,7 +335,7 @@ func (s *SecretMap) ListByNamespace(ns string) ([]*corev1.Secret, error) {
 	return nil, fmt.Errorf("SecretMap: namespace %s not found", ns)
 }
 
-func (s *SecretMap) GetIngressByNamespace(ns, secretName string) (*corev1.Secret, error) {
+func (s *SecretMap) GetSecretByNamespace(ns, secretName string) (*corev1.Secret, error) {
 	if list, ok := s.data.Load(ns); ok {
 		for _, secret := range list.([]*corev1.Secret) {
 			if secret.Name == secretName {
@@ -343,4 +345,101 @@ func (s *SecretMap) GetIngressByNamespace(ns, secretName string) (*corev1.Secret
 		return nil, fmt.Errorf("SecretMap: record %s.%s not found", ns, secretName)
 	}
 	return nil, fmt.Errorf("SecretMap: namespace %s not found", ns)
+}
+
+////////////////////////////////////////////ConfigMapMap
+//由于configmap有一直刷新的问题，所以需要特殊适配
+
+type cm struct {
+	cmdata *corev1.ConfigMap
+	md5    string
+}
+
+func newCm(cmdata *corev1.ConfigMap) *cm {
+	return &cm{
+		cmdata: cmdata,
+		md5:    helper.Md5Data(cmdata.Data),
+	}
+}
+
+//实现排序接口
+type CoreV1ConfigMapMap []*cm
+
+func (c CoreV1ConfigMapMap) Len() int {
+	return len(c)
+}
+
+func (c CoreV1ConfigMapMap) Less(i, j int) bool {
+	return c[i].cmdata.CreationTimestamp.Time.After(c[j].cmdata.CreationTimestamp.Time)
+}
+
+func (c CoreV1ConfigMapMap) Swap(i, j int) {
+	c[i], c[j] = c[i], c[j]
+}
+
+type ConfigMapMap struct {
+	data sync.Map
+}
+
+func NewConfigMapMap() *ConfigMapMap {
+	return &ConfigMapMap{}
+}
+
+func (c *ConfigMapMap) Add(configmap *corev1.ConfigMap) {
+	if list, ok := c.data.Load(configmap.Namespace); ok {
+		list = append(list.([]*cm), newCm(configmap))
+		c.data.Store(configmap.Namespace, list)
+	} else {
+		c.data.Store(configmap.Namespace, []*cm{newCm(configmap)})
+	}
+}
+
+//true代表有值更新，否则返回false
+func (c *ConfigMapMap) Update(configmap *corev1.ConfigMap) (bool, error) {
+	if list, ok := c.data.Load(configmap.Namespace); ok {
+		for i, item := range list.([]*cm) {
+			if item.cmdata.Name == configmap.Name && !helper.CmIsEq(item.cmdata.Data, configmap.Data) {
+				list.([]*cm)[i] = newCm(configmap)
+				return true, nil
+			}
+		}
+		return false, nil
+	}
+	return false, fmt.Errorf("ConfigMapMap: ConfigMapMap-#{configmap.Name} not found")
+}
+
+func (c *ConfigMapMap) Delete(configmap *corev1.ConfigMap) {
+	if list, ok := c.data.Load(configmap.Namespace); ok {
+		for j, rangeIngress := range list.([]*cm) {
+			if rangeIngress.cmdata.Name == configmap.Name {
+				newList := append(list.([]*cm)[:j], list.([]*cm)[j+1:]...)
+				c.data.Store(configmap.Namespace, newList)
+			}
+		}
+	}
+}
+
+func (c *ConfigMapMap) ListByNamespace(ns string) ([]*corev1.ConfigMap, error) {
+	ret := make([]*corev1.ConfigMap, 0)
+	if list, ok := c.data.Load(ns); ok {
+		cmlist := list.([]*cm)
+		sort.Sort(CoreV1ConfigMapMap(cmlist))
+		for _, cm := range cmlist {
+			ret = append(ret, cm.cmdata)
+		}
+		return ret, nil
+	}
+	return nil, fmt.Errorf("ConfigMapMap: namespace %s not found", ns)
+}
+
+func (c *ConfigMapMap) GetConfigMapByNamespace(ns, configMapName string) (*corev1.ConfigMap, error) {
+	if list, ok := c.data.Load(ns); ok {
+		for _, item := range list.([]*cm) {
+			if item.cmdata.Name == configMapName {
+				return item.cmdata, nil
+			}
+		}
+		return nil, fmt.Errorf("ConfigMapMap: record %s.%s not found", ns, configMapName)
+	}
+	return nil, fmt.Errorf("ConfigMapMap: namespace %s not found", ns)
 }

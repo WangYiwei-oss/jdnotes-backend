@@ -106,9 +106,5 @@ func (i *IngressService) GetIngressDetail(name, namespace string) (*models.Ingre
 }
 
 func (i *IngressService) DelIngress(name, namespace string) error {
-	err := i.Client.NetworkingV1beta1().Ingresses(namespace).Delete(context.Background(), name, v1.DeleteOptions{})
-	if err != nil {
-		return err
-	}
-	return nil
+	return i.Client.NetworkingV1beta1().Ingresses(namespace).Delete(context.Background(), name, v1.DeleteOptions{})
 }

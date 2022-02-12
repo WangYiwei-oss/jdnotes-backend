@@ -1,15 +1,19 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/models"
 	v1 "k8s.io/api/apps/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 type DeploymentService struct {
-	DepMap        *DeploymentMap `inject:"-"`
-	CommonService *CommonService `inject:"-"`
-	DepHandler    *DepHandler    `inject:"-"`
+	DepMap        *DeploymentMap        `inject:"-"`
+	CommonService *CommonService        `inject:"-"`
+	DepHandler    *DepHandler           `inject:"-"`
+	Client        *kubernetes.Clientset `inject:"-"`
 }
 
 func NewDeploymentService() *DeploymentService {
@@ -51,4 +55,8 @@ func (d *DeploymentService) ListNamespace(namespace string) (ret []*models.Deplo
 		})
 	}
 	return
+}
+
+func (d *DeploymentService) DeleteDeployment(name, namespace string) error {
+	return d.Client.AppsV1().Deployments(namespace).Delete(context.Background(), name, metav1.DeleteOptions{})
 }

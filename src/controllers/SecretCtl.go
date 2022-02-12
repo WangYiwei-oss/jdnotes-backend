@@ -68,7 +68,16 @@ func (s *SecretCtl) CreateSecret(c *gin.Context) int {
 	return 1
 }
 
+func (s *SecretCtl) DeleteSecret(c *gin.Context) int {
+	err := s.SecretService.DelSecret(c.Query("name"), c.Query("namespace"))
+	if err != nil {
+		return -400
+	}
+	return 1
+}
+
 func (s *SecretCtl) Build(jdft *jdft.Jdft) {
 	jdft.Handle("GET", "secrets", s.GetList)
 	jdft.Handle("GET", "secrets_ws", s.WebSocketConn)
+	jdft.Handle("DELETE", "secret", s.DeleteSecret)
 }

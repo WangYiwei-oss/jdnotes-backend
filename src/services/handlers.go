@@ -181,3 +181,36 @@ func (s *SecretHandler) OnDelete(obj interface{}) {
 		s.SecretService.ListNamespace(obj.(*corev1.Secret).Namespace),
 		obj.(*corev1.Secret).Namespace)
 }
+
+///////////////////ConfigMapHandler
+
+type ConfigMapHandler struct {
+	ConfigMapMap     *ConfigMapMap     `inject:"-"`
+	ConfigMapService *ConfigMapService `inject:"-"`
+}
+
+func (c *ConfigMapHandler) OnAdd(obj interface{}) {
+	c.ConfigMapMap.Add(obj.(*corev1.ConfigMap))
+	jdft.WebSocketFactory.SendAllClass("configmaps",
+		c.ConfigMapService.ListNamespace(obj.(*corev1.ConfigMap).Namespace),
+		obj.(*corev1.ConfigMap).Namespace)
+}
+func (c *ConfigMapHandler) OnUpdate(oldObj, newObj interface{}) {
+	isupdate, err := c.ConfigMapMap.Update(newObj.(*corev1.ConfigMap))
+	if err != nil {
+		log.Println(err)
+	}
+	if isupdate {
+		fmt.Println("config更新并通知")
+		jdft.WebSocketFactory.SendAllClass("configmaps",
+			c.ConfigMapService.ListNamespace(newObj.(*corev1.ConfigMap).Namespace),
+			newObj.(*corev1.ConfigMap).Namespace)
+	}
+}
+
+func (c *ConfigMapHandler) OnDelete(obj interface{}) {
+	c.ConfigMapMap.Delete(obj.(*corev1.ConfigMap))
+	jdft.WebSocketFactory.SendAllClass("configmaps",
+		c.ConfigMapService.ListNamespace(obj.(*corev1.ConfigMap).Namespace),
+		obj.(*corev1.ConfigMap).Namespace)
+}
