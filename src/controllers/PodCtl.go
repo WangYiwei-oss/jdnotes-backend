@@ -7,8 +7,10 @@ import (
 	"github.com/WangYiwei-oss/jdframe/wscore"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/services"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"io"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/tools/remotecommand"
 	"log"
 	"net/http"
 )
@@ -117,10 +119,82 @@ func (p *PodCtl) GetContainerLogStream(c *gin.Context) int {
 	return 1
 }
 
+//func (p *PodCtl)ExecWsConnect(c *gin.Context)int{
+//	client,err := wscore.Upgrader.Upgrade(c.Writer,c.Request,nil)
+//	if err != nil {
+//		return -103
+//	}else{
+//		jdft.WebSocketFactory.Store("pod_shell",client,
+//			make(map[string]string), nil,
+//			func(client *wscore.WsClient, i int, bytes []byte) {})
+//	}
+//	return 1
+//}
+
+type WsShellClient struct {
+	client *websocket.Conn
+}
+
+func NewWsShellClient(client *websocket.Conn) *WsShellClient {
+	return &WsShellClient{client: client}
+}
+
+func (w *WsShellClient) Write(p []byte) (n int, err error) {
+	err = w.client.WriteMessage(websocket.TextMessage, p)
+	if err != nil {
+		return 0, err
+	}
+	return len(p), nil
+}
+
+func (w *WsShellClient) Read(p []byte) (n int, err error) {
+	_, b, err := w.client.ReadMessage()
+	if err != nil {
+		return 0, err
+	}
+	return copy(p, string(b)), nil
+}
+
+func (p *PodCtl) ExecWsConnect(c *gin.Context) int {
+	client, err := wscore.Upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		log.Println("PodCtl: 升级失败")
+		return -103
+	}
+	client.WriteMessage(websocket.TextMessage, []byte("连接成功\n"))
+	shellClient := NewWsShellClient(client)
+	excutor, err := p.PodService.HandleCommand(p.PodService.Client, p.PodService.K8sRestConfig, []string{"sh"})
+	if err != nil {
+		log.Println("PodCtl: 创建Excutor失败")
+		return -103
+	}
+	err = excutor.Stream(remotecommand.StreamOptions{
+		Stdin:  shellClient,
+		Stdout: shellClient,
+		Stderr: shellClient,
+		Tty:    true,
+	})
+	if err != nil {
+		log.Println("PodCtl: 创建流失败")
+		return -103
+	}
+	return 1
+}
+
+func (p *PodCtl) GetPodDetail(c *gin.Context) (int, jdft.Json) {
+	detail, err := p.PodService.GetPodDetail(c.Query("name"), c.Query("namespace"))
+	if err != nil {
+		return -400, err.Error()
+	}
+	return 1, detail
+}
+
 func (p *PodCtl) Build(jdft *jdft.Jdft) {
 	jdft.Handle("GET", "pods", p.GetList)
 	jdft.Handle("GET", "pods_ws", p.WebSocketConn)
+	jdft.Handle("GET", "pod", p.GetPodDetail)
 	jdft.Handle("DELETE", "pod", p.DeletePod)
 	jdft.Handle("GET", "pod/containers", p.GetContainers)
 	jdft.Handle("GET", "pod/container/log", p.GetContainerLogStream)
+	jdft.Handle("GET", "pod/exec/ws", p.ExecWsConnect)
 }

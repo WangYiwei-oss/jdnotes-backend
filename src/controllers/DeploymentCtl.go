@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/WangYiwei-oss/jdframe/src/jdft"
 	"github.com/WangYiwei-oss/jdframe/wscore"
+	"github.com/WangYiwei-oss/jdnotes-backend/src/models"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/services"
 	"github.com/gin-gonic/gin"
 	"k8s.io/client-go/kubernetes"
@@ -54,6 +55,7 @@ func (d *DeploymentCtl) WebSocketConn(c *gin.Context) int {
 	}
 }
 
+// DeleteDeployment 删除deployment
 func (d *DeploymentCtl) DeleteDeployment(c *gin.Context) int {
 	err := d.DepService.DeleteDeployment(c.Query("name"), c.Query("namespace"))
 	if err != nil {
@@ -62,8 +64,32 @@ func (d *DeploymentCtl) DeleteDeployment(c *gin.Context) int {
 	return 1
 }
 
+// GetDeploymentDetail 获取deployment详情
+func (d *DeploymentCtl) GetDeploymentDetail(c *gin.Context) (int, jdft.Json) {
+	detail, err := d.DepService.GetDeploymentDetail(c.Query("name"), c.Query("namespace"))
+	if err != nil {
+		return -400, err.Error()
+	}
+	return 1, detail
+}
+
+func (d *DeploymentCtl) CreateDeployment(c *gin.Context) (int, string) {
+	postModel := &models.DeploymentPost{}
+	err := c.BindJSON(postModel)
+	if err != nil {
+		return -400, err.Error()
+	}
+	err = d.DepService.CreateDeployment(postModel)
+	if err != nil {
+		return -400, err.Error()
+	}
+	return 1, ""
+}
+
 func (d *DeploymentCtl) Build(jdft *jdft.Jdft) {
 	jdft.Handle("GET", "deployments", d.GetList)
+	jdft.Handle("GET", "deployment", d.GetDeploymentDetail)
 	jdft.Handle("GET", "deployments_ws", d.WebSocketConn)
 	jdft.Handle("DELETE", "deployment", d.DeleteDeployment)
+	jdft.Handle("POST", "deployment", d.CreateDeployment)
 }

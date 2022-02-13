@@ -5,11 +5,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"log"
 )
 
 type K8sConfig struct {
+	K8sRestConfig    *rest.Config
 	DepHandler       *services.DepHandler       `inject:"-"`
 	PodHandler       *services.PodHandler       `inject:"-"`
 	NamespaceHandler *services.NamespaceHandler `inject:"-"`
@@ -23,7 +25,15 @@ func NewK8sConfig() *K8sConfig {
 	return &K8sConfig{}
 }
 
-func (*K8sConfig) JdInitClient() *kubernetes.Clientset {
+func (k *K8sConfig) JdInitK8sRestConfig() *rest.Config {
+	config, err := clientcmd.BuildConfigFromFlags("", "config")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return config
+}
+
+func (k *K8sConfig) JdInitClient() *kubernetes.Clientset {
 	//ip := jdft.GetGlobalSettings()["KUBERNETES_HOST"]
 	//config := &rest.Config{
 	//	Host:        fmt.Sprintf("http://%s", ip.(string)),

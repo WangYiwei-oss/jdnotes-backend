@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"strconv"
@@ -70,4 +71,19 @@ func (c *CommonService) GetServicePorts(servicePorts []corev1.ServicePort) strin
 		ret = ret + port.Name + "/" + strconv.Itoa(int(port.Port)) + nodeport + "/" + ProtoMap[port.Protocol] + ","
 	}
 	return ret[:len(ret)-1]
+}
+
+func (c *CommonService) GetPodMounts(container *corev1.Pod) string {
+	ret := ""
+	return ret
+}
+
+func (c *CommonService) SimpleMap2String(labels map[string]string) (ret string) {
+	for k, v := range labels {
+		if ret != "" {
+			ret += ","
+		}
+		ret += fmt.Sprintf("%s=%s", string(k), string(v))
+	}
+	return
 }
