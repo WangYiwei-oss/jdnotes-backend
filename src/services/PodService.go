@@ -114,9 +114,9 @@ func (p *PodService) GetPodDetail(name, namespace string) (*models.PodDetail, er
 
 //Exec相关
 
-func (p *PodService) HandleCommand(client *kubernetes.Clientset, config *rest.Config, command []string) (remotecommand.Executor, error) {
+func (p *PodService) HandleCommand(post *models.PodShellPost, client *kubernetes.Clientset, config *rest.Config, command []string) (remotecommand.Executor, error) {
 	option := &corev1.PodExecOptions{
-		Container: "demo",
+		Container: post.ContainerName,
 		Command:   command,
 		Stdin:     true,
 		Stdout:    true,
@@ -125,8 +125,8 @@ func (p *PodService) HandleCommand(client *kubernetes.Clientset, config *rest.Co
 	}
 	req := client.CoreV1().RESTClient().Post().
 		Resource("pods").
-		Namespace("default").
-		Name("demo-65797b6745-2lglw").
+		Namespace(post.Namespace).
+		Name(post.PodName).
 		SubResource("exec").
 		Param("color", "false").
 		VersionedParams(option, scheme.ParameterCodec)

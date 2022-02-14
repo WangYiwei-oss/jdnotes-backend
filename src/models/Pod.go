@@ -12,6 +12,12 @@ type Pod struct {
 	CreateTime string   `json:"create_time"`
 }
 
+type PodShellPost struct {
+	PodName       string `json:"pod_name"`
+	Namespace     string `json:"namespace"`
+	ContainerName string `json:"container_name"`
+}
+
 type PodDetail struct {
 	Name        string       `json:"name"`
 	Namespace   string       `json:"namespace"`

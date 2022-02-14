@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/WangYiwei-oss/jdframe/src/jdft"
 	"github.com/WangYiwei-oss/jdframe/wscore"
+	"github.com/WangYiwei-oss/jdnotes-backend/src/models"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/services"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -156,6 +157,12 @@ func (w *WsShellClient) Read(p []byte) (n int, err error) {
 }
 
 func (p *PodCtl) ExecWsConnect(c *gin.Context) int {
+	postData := &models.PodShellPost{
+		PodName:       c.Query("pod_name"),
+		Namespace:     c.Query("namespace"),
+		ContainerName: c.Query("container_name"),
+	}
+
 	client, err := wscore.Upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("PodCtl: 升级失败")
@@ -163,7 +170,7 @@ func (p *PodCtl) ExecWsConnect(c *gin.Context) int {
 	}
 	client.WriteMessage(websocket.TextMessage, []byte("连接成功\n"))
 	shellClient := NewWsShellClient(client)
-	excutor, err := p.PodService.HandleCommand(p.PodService.Client, p.PodService.K8sRestConfig, []string{"sh"})
+	excutor, err := p.PodService.HandleCommand(postData, p.PodService.Client, p.PodService.K8sRestConfig, []string{"sh"})
 	if err != nil {
 		log.Println("PodCtl: 创建Excutor失败")
 		return -103
