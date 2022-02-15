@@ -58,6 +58,15 @@ func (c *CommonService) GetPodIsReady(pod *corev1.Pod) bool {
 	return true
 }
 
+func (c *CommonService)GetNodeIsReady(node *corev1.Node)bool{
+	for _,condition := range node.Status.Conditions{
+		if condition.Status!=corev1.ConditionTrue{
+			return false
+		}
+	}
+	return true
+}
+
 func (c *CommonService) GetServicePorts(servicePorts []corev1.ServicePort) string {
 	ret := ""
 	if servicePorts == nil || len(servicePorts) == 0 {
@@ -86,4 +95,12 @@ func (c *CommonService) SimpleMap2String(labels map[string]string) (ret string) 
 		ret += fmt.Sprintf("%s=%s", string(k), string(v))
 	}
 	return
+}
+
+func (c *CommonService) SimpleMap2Slice(labels map[string]string) []string {
+	ret:=make([]string,0)
+	for k, v := range labels {
+		ret = append(ret,fmt.Sprintf("%s=%s", string(k), string(v)))
+	}
+	return ret
 }

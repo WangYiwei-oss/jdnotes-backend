@@ -19,6 +19,7 @@ type K8sConfig struct {
 	IngressHandler   *services.IngressHandler   `inject:"-"`
 	SecretHandler    *services.SecretHandler    `inject:"-"`
 	ConfigMapHandler *services.ConfigMapHandler `inject:"-"`
+	NodeHandler      *services.NodeHandler	    `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -73,6 +74,9 @@ func (k *K8sConfig) JdInitInformer() informers.SharedInformerFactory {
 
 	configInformer := fact.Core().V1().ConfigMaps()
 	configInformer.Informer().AddEventHandler(k.ConfigMapHandler)
+
+	nodeInformer := fact.Core().V1().Nodes()
+	nodeInformer.Informer().AddEventHandler(k.NodeHandler)
 
 	fact.Start(wait.NeverStop)
 	return fact

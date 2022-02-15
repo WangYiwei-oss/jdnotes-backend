@@ -38,3 +38,7 @@ func (n *K8sHandler) JdInitSecretHandlers() *services.SecretHandler {
 func (n *K8sHandler) JdInitConfigMapHandlers() *services.ConfigMapHandler {
 	return &services.ConfigMapHandler{}
 }
+
+func (n *K8sHandler) JdInitNodeMapHandlers() *services.NodeHandler {
+	return &services.NodeHandler{}
+}

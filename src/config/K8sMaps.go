@@ -40,3 +40,7 @@ func (k *K8sMap) JdInitSecretMap() *services.SecretMap {
 func (k *K8sMap) JdInitConfigMapMap() *services.ConfigMapMap {
 	return &services.ConfigMapMap{}
 }
+
+func (k *K8sMap) JdInitNodeMapMap() *services.NodeMap {
+	return &services.NodeMap{}
+}

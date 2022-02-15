@@ -214,3 +214,33 @@ func (c *ConfigMapHandler) OnDelete(obj interface{}) {
 		c.ConfigMapService.ListNamespace(obj.(*corev1.ConfigMap).Namespace),
 		obj.(*corev1.ConfigMap).Namespace)
 }
+
+///////////////////NodeHandler
+
+type NodeHandler struct {
+	NodeMap     *NodeMap     `inject:"-"`
+	NodeService *NodeService `inject:"-"`
+}
+
+func (n *NodeHandler) OnAdd(obj interface{}) {
+	n.NodeMap.Add(obj.(*corev1.Node))
+	jdft.WebSocketFactory.SendAllClass("nodes",
+		n.NodeService.List(),
+		nil)
+}
+func (n *NodeHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := n.NodeMap.Update(newObj.(*corev1.Node))
+	if err != nil {
+		log.Println(err)
+	}
+	jdft.WebSocketFactory.SendAllClass("nodes",
+		n.NodeService.List(),
+		nil)
+}
+
+func (n *NodeHandler) OnDelete(obj interface{}) {
+	n.NodeMap.Delete(obj.(*corev1.Node))
+	jdft.WebSocketFactory.SendAllClass("nodes",
+		n.NodeService.List(),
+		nil)
+}

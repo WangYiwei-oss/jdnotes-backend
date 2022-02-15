@@ -42,3 +42,7 @@ func (s *ServiceConfig) JdInitSecretService() *services.SecretService {
 func (s *ServiceConfig) JdInitConfigMapService() *services.ConfigMapService {
 	return services.NewConfigMapService()
 }
+
+func (s *ServiceConfig) JdInitNodeMapService() *services.NodeService {
+	return services.NewNodeService()
+}
