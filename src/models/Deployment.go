@@ -13,8 +13,8 @@ type Deployment struct {
 type DeploymentDetail struct {
 	Name        string   `json:"name"`
 	Namespace   string   `json:"namespace"`
-	Labels      string   `json:"labels"`
-	Annotations string   `json:"annotations"`
+	Labels      []string `json:"labels"`
+	Annotations []string `json:"annotations"`
 	Replicas    [3]int32 `json:"replicas"` //总副本数，可用副本数，不可用副本数
 	Images      string   `json:"images"`
 	IsComplete  bool     `json:"is_complete"` //是否完成

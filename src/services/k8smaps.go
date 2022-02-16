@@ -136,6 +136,19 @@ func (p *PodMap) GetPodByNamespace(ns, podName string) (*corev1.Pod, error) {
 	return nil, fmt.Errorf("namespace %s not found", ns)
 }
 
+func (p *PodMap) GetPodNumberByNode(nodeName string) int {
+	ret := 0
+	p.data.Range(func(key, value interface{}) bool {
+		for _, pod := range value.([]*corev1.Pod) {
+			if pod.Spec.NodeName == nodeName {
+				ret++
+			}
+		}
+		return true
+	})
+	return ret
+}
+
 ////////////////////////////////////////////NamespaceMap
 
 type NamespaceMap struct {
@@ -455,13 +468,13 @@ func NewNodeMap() *NodeMap {
 }
 
 func (n *NodeMap) Add(node *corev1.Node) {
-	if node!=nil{
-		n.data.Store(node.Name,node)
+	if node != nil {
+		n.data.Store(node.Name, node)
 	}
 }
 func (n *NodeMap) Update(node *corev1.Node) error {
 	if _, ok := n.data.Load(node.Name); ok {
-		n.data.Store(node.Name,node)
+		n.data.Store(node.Name, node)
 		return nil
 	}
 	return fmt.Errorf("SecretMap: Secret-#{secret.Name} not found")
@@ -474,9 +487,9 @@ func (n *NodeMap) Delete(node *corev1.Node) {
 }
 
 func (n *NodeMap) List() []*corev1.Node {
-	ret:=make([]*corev1.Node,0)
+	ret := make([]*corev1.Node, 0)
 	n.data.Range(func(key, value interface{}) bool {
-		ret=append(ret,value.(*corev1.Node))
+		ret = append(ret, value.(*corev1.Node))
 		return true
 	})
 	return ret
@@ -484,7 +497,7 @@ func (n *NodeMap) List() []*corev1.Node {
 
 func (n *NodeMap) Get(nodeName string) (*corev1.Node, error) {
 	if node, ok := n.data.Load(nodeName); ok {
-		return node.(*corev1.Node),nil
+		return node.(*corev1.Node), nil
 	}
-	return nil,fmt.Errorf("NodeMap: record %s not found",nodeName)
+	return nil, fmt.Errorf("NodeMap: record %s not found", nodeName)
 }

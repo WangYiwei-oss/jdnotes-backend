@@ -7,6 +7,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/metrics/pkg/client/clientset/versioned"
 	"log"
 )
 
@@ -19,7 +20,7 @@ type K8sConfig struct {
 	IngressHandler   *services.IngressHandler   `inject:"-"`
 	SecretHandler    *services.SecretHandler    `inject:"-"`
 	ConfigMapHandler *services.ConfigMapHandler `inject:"-"`
-	NodeHandler      *services.NodeHandler	    `inject:"-"`
+	NodeHandler      *services.NodeHandler      `inject:"-"`
 }
 
 func NewK8sConfig() *K8sConfig {
@@ -32,6 +33,18 @@ func (k *K8sConfig) JdInitK8sRestConfig() *rest.Config {
 		log.Fatalln(err)
 	}
 	return config
+}
+
+func (k *K8sConfig) JdInitMetricClient() *versioned.Clientset {
+	config, err := clientcmd.BuildConfigFromFlags("", "config")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	c, err := versioned.NewForConfig(config)
+	if err != nil {
+		log.Fatalln("init k8s client error", err)
+	}
+	return c
 }
 
 func (k *K8sConfig) JdInitClient() *kubernetes.Clientset {

@@ -101,8 +101,8 @@ func (d *DeploymentService) GetDeploymentDetail(name, namespace string) (*models
 	return &models.DeploymentDetail{
 		Name:        dep.Name,
 		Namespace:   dep.Namespace,
-		Labels:      d.CommonService.SimpleMap2String(dep.Labels),
-		Annotations: d.CommonService.SimpleMap2String(dep.Annotations),
+		Labels:      d.CommonService.SimpleMap2Slice(dep.Labels),
+		Annotations: d.CommonService.SimpleMap2Slice(dep.Annotations),
 		Replicas: [3]int32{dep.Status.Replicas,
 			dep.Status.AvailableReplicas,
 			dep.Status.UnavailableReplicas,

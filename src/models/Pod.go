@@ -28,8 +28,8 @@ type PodDetail struct {
 	IsReady     bool         `json:"is_ready"` //pod是否就绪
 	Message     string       `json:"message"`
 	CreateTime  string       `json:"create_time"`
-	Labels      string       `json:"labels"`
-	Annotations string       `json:"annotations"`
+	Labels      []string     `json:"labels"`
+	Annotations []string     `json:"annotations"`
 	Containers  []*Container `json:"containers"`
 }
 

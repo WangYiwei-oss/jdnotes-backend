@@ -19,7 +19,6 @@ func ReadabilityMap(amap interface{}) interface{} {
 		field := v_amap.Field(i)
 		if field.Kind() == reflect.String {
 			if field.String() == "" {
-				fmt.Println("--------", field.CanSet())
 			}
 		}
 	}

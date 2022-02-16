@@ -105,8 +105,8 @@ func (p *PodService) GetPodDetail(name, namespace string) (*models.PodDetail, er
 		IsReady:     p.CommonService.GetPodIsReady(pod),
 		Message:     pod.Status.Message,
 		CreateTime:  pod.CreationTimestamp.Format("2006-01-02 15:04:05"),
-		Labels:      p.CommonService.SimpleMap2String(pod.Labels),
-		Annotations: p.CommonService.SimpleMap2String(pod.Annotations),
+		Labels:      p.CommonService.SimpleMap2Slice(pod.Labels),
+		Annotations: p.CommonService.SimpleMap2Slice(pod.Annotations),
 		Containers:  containers,
 	}
 	return ret, nil
