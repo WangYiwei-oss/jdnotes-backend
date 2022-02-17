@@ -6,6 +6,7 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	netv1beta1 "k8s.io/api/networking/v1beta1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"sort"
 	"sync"
 )
@@ -500,4 +501,64 @@ func (n *NodeMap) Get(nodeName string) (*corev1.Node, error) {
 		return node.(*corev1.Node), nil
 	}
 	return nil, fmt.Errorf("NodeMap: record %s not found", nodeName)
+}
+
+////////////////////////////////////////////RoleMap
+
+type RoleMap struct {
+	data sync.Map
+}
+
+func NewRoleMap() *RoleMap {
+	return &RoleMap{}
+}
+
+func (r *RoleMap) Add(role *rbacv1.Role) {
+	if list, ok := r.data.Load(role.Namespace); ok {
+		list = append(list.([]*rbacv1.Role), role)
+		r.data.Store(role.Namespace, list)
+	} else {
+		r.data.Store(role.Namespace, []*rbacv1.Role{role})
+	}
+}
+func (r *RoleMap) Update(role *rbacv1.Role) error {
+	if list, ok := r.data.Load(role.Namespace); ok {
+		for i, rangeRole := range list.([]*rbacv1.Role) {
+			if rangeRole.Name == role.Name {
+				list.([]*rbacv1.Role)[i] = role
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("RoleMap: Role-#{Role.Name} not found")
+}
+
+func (r *RoleMap) Delete(role *rbacv1.Role) {
+	if list, ok := r.data.Load(role.Namespace); ok {
+		for j, rangeIngress := range list.([]*rbacv1.Role) {
+			if rangeIngress.Name == role.Name {
+				newList := append(list.([]*rbacv1.Role)[:j], list.([]*rbacv1.Role)[j+1:]...)
+				r.data.Store(role.Namespace, newList)
+			}
+		}
+	}
+}
+
+func (r *RoleMap) ListByNamespace(ns string) ([]*rbacv1.Role, error) {
+	if list, ok := r.data.Load(ns); ok {
+		return list.([]*rbacv1.Role), nil
+	}
+	return nil, fmt.Errorf("RoleMap: namespace %s not found", ns)
+}
+
+func (r *RoleMap) GetRoleByNamespace(ns, roleName string) (*rbacv1.Role, error) {
+	if list, ok := r.data.Load(ns); ok {
+		for _, role := range list.([]*rbacv1.Role) {
+			if role.Name == roleName {
+				return role, nil
+			}
+		}
+		return nil, fmt.Errorf("RoleMap: record %s.%s not found", ns, roleName)
+	}
+	return nil, fmt.Errorf("RoleMap: namespace %s not found", ns)
 }

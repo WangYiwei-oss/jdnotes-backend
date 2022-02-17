@@ -41,6 +41,10 @@ func (k *K8sMap) JdInitConfigMapMap() *services.ConfigMapMap {
 	return &services.ConfigMapMap{}
 }
 
-func (k *K8sMap) JdInitNodeMapMap() *services.NodeMap {
+func (k *K8sMap) JdInitNodeMap() *services.NodeMap {
 	return &services.NodeMap{}
+}
+
+func (k *K8sMap) JdInitRoleMap() *services.RoleMap {
+	return &services.RoleMap{}
 }

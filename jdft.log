@@ -139,3 +139,17 @@
 {"Level":"info","Time":"2022-02-17 00:54:13","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
 {"Level":"info","Time":"2022-02-17 01:08:01","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
 {"Level":"info","Time":"2022-02-17 01:12:45","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-17 20:18:06","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-17 21:07:06","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-17 22:25:32","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-17 22:26:42","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-17 22:27:24","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-17 22:29:24","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-17 22:31:43","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-17 23:57:48","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-17 23:59:10","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-18 00:01:15","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-18 00:04:11","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-18 00:05:11","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-18 00:05:47","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-18 00:07:45","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}

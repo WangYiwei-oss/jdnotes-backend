@@ -6,6 +6,7 @@ import (
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	netv1beta1 "k8s.io/api/networking/v1beta1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	"log"
 )
 
@@ -17,7 +18,6 @@ type DepHandler struct {
 }
 
 func (d *DepHandler) OnAdd(obj interface{}) {
-	fmt.Println("创建了dep")
 	d.DepMap.Add(obj.(*v1.Deployment))
 	jdft.WebSocketFactory.SendAllClass("deployments",
 		d.DepService.ListNamespace(obj.(*v1.Deployment).Namespace),
@@ -35,7 +35,6 @@ func (d *DepHandler) OnUpdate(oldObj, newObj interface{}) {
 }
 
 func (d *DepHandler) OnDelete(obj interface{}) {
-	fmt.Println("删除了dep") //？？？？？？？？？？？？？为什么不删除
 	d.DepMap.Delete(obj.(*v1.Deployment))
 	jdft.WebSocketFactory.SendAllClass("deployments",
 		d.DepService.ListNamespace(obj.(*v1.Deployment).Namespace),
@@ -243,4 +242,34 @@ func (n *NodeHandler) OnDelete(obj interface{}) {
 	jdft.WebSocketFactory.SendAllClass("nodes",
 		n.NodeService.List(),
 		nil)
+}
+
+///////////////////RoleHandler
+
+type RoleHandler struct {
+	RoleMap     *RoleMap     `inject:"-"`
+	RoleService *RoleService `inject:"-"`
+}
+
+func (r *RoleHandler) OnAdd(obj interface{}) {
+	r.RoleMap.Add(obj.(*rbacv1.Role))
+	jdft.WebSocketFactory.SendAllClass("roles",
+		r.RoleService.ListNamespace(obj.(*rbacv1.Role).Namespace),
+		obj.(*rbacv1.Role).Namespace)
+}
+func (r *RoleHandler) OnUpdate(oldObj, newObj interface{}) {
+	err := r.RoleMap.Update(newObj.(*rbacv1.Role))
+	if err != nil {
+		log.Println(err)
+	}
+	jdft.WebSocketFactory.SendAllClass("roles",
+		r.RoleService.ListNamespace(newObj.(*rbacv1.Role).Namespace),
+		newObj.(*rbacv1.Role).Namespace)
+}
+
+func (r *RoleHandler) OnDelete(obj interface{}) {
+	r.RoleMap.Delete(obj.(*rbacv1.Role))
+	jdft.WebSocketFactory.SendAllClass("roles",
+		r.RoleService.ListNamespace(obj.(*rbacv1.Role).Namespace),
+		obj.(*rbacv1.Role).Namespace)
 }

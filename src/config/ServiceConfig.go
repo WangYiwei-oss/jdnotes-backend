@@ -43,6 +43,14 @@ func (s *ServiceConfig) JdInitConfigMapService() *services.ConfigMapService {
 	return services.NewConfigMapService()
 }
 
-func (s *ServiceConfig) JdInitNodeMapService() *services.NodeService {
+func (s *ServiceConfig) JdInitNodeService() *services.NodeService {
 	return services.NewNodeService()
+}
+
+func (s *ServiceConfig) JdInitRoleService() *services.RoleService {
+	return services.NewRoleService()
+}
+
+func (s *ServiceConfig) JdInitResourceService() *services.ResourceService {
+	return services.NewResourceService()
 }

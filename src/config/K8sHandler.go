@@ -39,6 +39,10 @@ func (n *K8sHandler) JdInitConfigMapHandlers() *services.ConfigMapHandler {
 	return &services.ConfigMapHandler{}
 }
 
-func (n *K8sHandler) JdInitNodeMapHandlers() *services.NodeHandler {
+func (n *K8sHandler) JdInitNodeHandlers() *services.NodeHandler {
 	return &services.NodeHandler{}
+}
+
+func (n *K8sHandler) JdInitRoleHandlers() *services.RoleHandler {
+	return &services.RoleHandler{}
 }

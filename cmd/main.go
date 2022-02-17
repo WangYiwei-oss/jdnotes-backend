@@ -5,7 +5,6 @@ import (
 	"github.com/WangYiwei-oss/jdnotes-backend/src/common"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/config"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/controllers"
-	"github.com/WangYiwei-oss/jdnotes-backend/src/middlewares"
 )
 
 func migration() {
@@ -17,7 +16,7 @@ func main() {
 	common.GetFdNotify().Mount("D:\\test").Start()
 	jdft.NewJdft().
 		DefaultBean().
-		Attach(middlewares.CrossMiddleWare()).
+		//Attach(middlewares.CrossMiddleWare()).
 		Beans(
 			config.NewK8sMap(),
 			config.NewK8sHandler(),
@@ -34,6 +33,8 @@ func main() {
 			controllers.NewSecretCtl(),
 			controllers.NewConfigMapCtl(),
 			controllers.NewNodeCtl(),
+			controllers.NewRoleCtl(),
+			controllers.NewResourceCtl(),
 		).                                    //挂载路由
 		CronTask("0/3 * * * * *", func() {}). //定时器函数
 		Launch()
