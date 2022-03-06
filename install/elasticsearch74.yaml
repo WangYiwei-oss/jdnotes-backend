@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch74
+  namespace: jdnotes
+  labels:
+    db: elasticsearch74
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      db: elasticsearch74
+  template:
+    metadata:
+      labels:
+        db: elasticsearch74
+    spec:
+      containers:
+      - name: elasticsearch74
+        image: blacktop/elasticsearch:7.4
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9200
+        volumeMounts:
+        - name: es-data
+          mountPath: /usr/share/elasticsearch/data
+        env:
+        - name: discovery.type
+          value: "single-node"
+        - name: path.data
+          value: "/usr/share/elasticsearch/data"
+        - name: network.host
+          value: "0.0.0.0"
+        - name: http.port
+          value: "9200"
+        - name: http.cors.enabled
+          value: "true"
+        - name: http.cors.allow-origin
+          value: "/.*/"
+      volumes:
+        - name: es-data
+          persistentVolumeClaim:
+            claimName: elasticsearch
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch74-service
+  namespace: jdnotes
+spec:
+  selector:
+    db: elasticsearch74
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 9200
+      targetPort: 9200
+      nodePort: 31000

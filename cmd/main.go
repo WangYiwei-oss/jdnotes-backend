@@ -5,6 +5,7 @@ import (
 	"github.com/WangYiwei-oss/jdnotes-backend/src/common"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/config"
 	"github.com/WangYiwei-oss/jdnotes-backend/src/controllers"
+	"github.com/WangYiwei-oss/jdnotes-backend/src/middlewares"
 )
 
 func migration() {
@@ -16,7 +17,7 @@ func main() {
 	common.GetFdNotify().Mount("D:\\test").Start()
 	jdft.NewJdft().
 		DefaultBean().
-		//Attach(middlewares.CrossMiddleWare()).
+		Attach(middlewares.CrossMiddleWare()).
 		Beans(
 			config.NewK8sMap(),
 			config.NewK8sHandler(),

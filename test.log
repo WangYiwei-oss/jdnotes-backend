@@ -153,3 +153,7 @@
 {"Level":"info","Time":"2022-02-18 00:05:11","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
 {"Level":"info","Time":"2022-02-18 00:05:47","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
 {"Level":"info","Time":"2022-02-18 00:07:45","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-19 21:30:23","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-22 20:53:57","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-02-23 23:01:38","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
+{"Level":"info","Time":"2022-03-05 21:31:58","Caller":"configs/Logger.go:54","Msg":"WebSocket Core: start heartbeat"}
